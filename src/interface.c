@@ -12,7 +12,8 @@ static const char HEADER[HEADER_HEIGHT][HEADER_LENGTH] = {
 
 void clear_screen();
 void print_initial_screen();
-struct account_record create_user();
+struct account_record create_record();
+void search_records();
 
 void print_interface()
 {
@@ -24,30 +25,37 @@ void print_interface()
     while (1)
     {
         scanf("%s", &ch);
-        getchar();
+        char ch2 = getchar();
+
+        if (ch2 == EOF)
+            break;
 
         switch (ch)
         {
         case 'c':
-            clear_screen();
-            create_user();
+            create_record();
+            break;
+        case 's':
+            search_records();
             break;
         case 'q':
+        case EOF:
             break;
         default:
             print_initial_screen();
             break;
         }
 
-        if (ch != 'q')
+        if (ch != 'q' && ch != EOF)
             printf(": ");
         else
             break;
     }
 }
 
-struct account_record create_user()
+struct account_record create_record()
 {
+    clear_screen();
     struct account_record record;
 
     printf("name (%d): ", USERNAME_BUFFER_SIZE - 1);
@@ -65,9 +73,9 @@ struct account_record create_user()
 
     int is_saved = save_record(record);
 
-    if (is_saved == 0) 
+    if (is_saved == 0)
         printf("Record saved successfully\n");
-    else 
+    else
         printf("Something went wrong\n");
 
     printf("Press any key to continue\n\n");
@@ -77,6 +85,23 @@ struct account_record create_user()
     print_initial_screen();
 
     return record;
+}
+
+void search_records()
+{
+    clear_screen();
+    printf("Search: ");
+
+    struct account_record records[500];
+    char search_str[56];
+    char ch;
+
+    while (!is_end_of_string_char((ch = getchar())))
+    {
+        printf("%c\n", ch);
+    }
+
+    getchar();
 }
 
 void print_initial_screen()
@@ -92,6 +117,7 @@ void print_initial_screen()
     }
     printf("\nChoose an option\n");
     printf("> (c) create\n");
+    printf("> (s) search\n");
     printf("> (q) quit\n");
     printf("\n");
 }
