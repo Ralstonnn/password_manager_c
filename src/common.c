@@ -1,6 +1,42 @@
 #include <stdio.h>
 #include "common.h"
 
+struct account_record create_empty_account_record()
+{
+    struct account_record record = {"\0", "\0", "\0"};
+    return record;
+}
+
+void fill_arrays_with_empty_records(struct account_record *records, int size)
+{
+    for (int i = 0; i < size; i++)
+        records[i] = create_empty_account_record();
+}
+
+struct account_record parse_string_to_record(char *str)
+{
+    struct account_record record = create_empty_account_record();
+
+    int i = 0;
+    while (*str != ':')
+        record.name[i++] = *str++;
+    str++;
+    i = 0;
+    while (*str != ':')
+        record.username[i++] = *str++;
+    str++;
+    i = 0;
+    while (*str != ':' && !is_end_of_string_char(*str))
+        record.password[i++] = *str++;
+
+    return record;
+}
+
+int is_record_empty(struct account_record record)
+{
+    return is_string_empty(record.name) && is_string_empty(record.username) && is_string_empty(record.password);
+}
+
 int is_end_of_string_char(char ch)
 {
     return ch == EOF || ch == '\0' || ch == '\n';
@@ -20,6 +56,17 @@ void copy_str(char *src, char *dest)
     while (!is_end_of_string_char(*src))
         *dest++ = *src++;
     *dest = '\0';
+}
+
+int is_string_empty(char *str)
+{
+    while (!is_end_of_string_char(*str++))
+    {
+        if (*str != ' ' && *str != '\t')
+            return 0;
+    }
+
+    return 1;
 }
 
 void trim(char *str, char ch)
@@ -78,6 +125,17 @@ int get_string_no_whitespaces(char *str, int size)
 
     str[len++] = '\0';
     return len;
+}
+
+int are_equal_strings(char *search, char *other)
+{
+    while (!is_end_of_string_char(*search))
+        if (*search++ != *other++)
+            return 0;
+    if (*search != *other)
+        return 0;
+
+    return 1;
 }
 
 void print_by_chars(char *str)
