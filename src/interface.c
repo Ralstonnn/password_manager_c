@@ -73,9 +73,30 @@ struct account_record create_record()
     get_string_no_whitespaces(record.username, USERNAME_BUFFER_SIZE);
 
     printf("password (%d): ", PASSWORD_BUFFER_SIZE - 1);
-    get_string_no_whitespaces(record.password, PASSWORD_BUFFER_SIZE);
+    char ch;
+    int i = 0;
+    enable_raw_mode();
+    while (!is_end_of_string_char((ch = getchar())))
+    {
+        if (ch == '\b' || ch == 127)
+        {
+            if (i > 0)
+            {
+                --i;
+                printf("\b \b");
+            }
+            record.password[i] = '\0';
+        }
+        else
+        {
+            record.password[i++] = ch;
+            printf("*");
+        }
+    }
+    record.password[i] = '\0';
+    disable_raw_mode();
 
-    printf("\n");
+    printf("\n\n");
 
     // If all fields are empty - skip saving
     if (is_string_empty(record.name) && is_string_empty(record.username) && is_string_empty(record.password))
