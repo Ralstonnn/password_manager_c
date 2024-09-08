@@ -11,7 +11,6 @@ static const char HEADER[HEADER_HEIGHT][HEADER_LENGTH] = {
     "#            PM (NOT NADYA)            #",
     "########################################"};
 
-void clear_screen();
 void print_initial_screen();
 struct account_record create_record();
 void show_search_records();
@@ -78,7 +77,7 @@ struct account_record create_record()
     enable_raw_mode();
     while (!is_end_of_string_char((ch = getchar())))
     {
-        if (ch == '\b' || ch == 127)
+        if (is_backspace_char(ch))
         {
             if (i > 0)
             {
@@ -94,7 +93,6 @@ struct account_record create_record()
         }
     }
     record.password[i] = '\0';
-    disable_raw_mode();
 
     printf("\n\n");
 
@@ -114,35 +112,16 @@ struct account_record create_record()
     }
 
     printf("Press any key to continue\n\n");
-
     getchar();
+    disable_raw_mode();
 
     print_initial_screen();
 
     return record;
 }
 
-void show_search_records()
+void print_records(struct account_record *records, int records_size, int selected_record_idx)
 {
-    clear_screen();
-    printf("Search: ");
-
-    char search_str[56];
-    char ch;
-    int i, selected_record_idx;
-    i = selected_record_idx = 0;
-
-    while (!is_end_of_string_char((ch = getchar())) && i < 55)
-        search_str[i++] = ch;
-    search_str[i] = '\0';
-    printf("\n");
-
-    int records_size = 5;
-    struct account_record records[records_size];
-    fill_arrays_with_empty_records(records, records_size);
-    search_records(search_str, records_size, records);
-
-print_records:
     for (int i = 0; i < records_size; i++)
     {
         if (is_record_empty(records[i]))
@@ -159,11 +138,28 @@ print_records:
             printf("   Username: %s\n\n", records[i].username);
         }
     }
+}
 
+void show_search_records()
+{
+    clear_screen();
     enable_raw_mode();
-    while (1)
+    printf("Search: ");
+
+    char search_str[56];
+    char ch;
+    int i, selected_record_idx, records_size_max, records_size;
+
+    i = selected_record_idx = 0;
+    records_size_max = 5;
+
+    struct account_record records[records_size_max];
+    fill_arrays_with_empty_records(records, records_size_max);
+
+    while (!is_end_of_string_char((ch = getchar())) && i < 55)
     {
-        ch = getchar();
+        hide_cursor();
+
         if (ch == '\x1b')
         {
             ch = getchar();
@@ -174,33 +170,44 @@ print_records:
                 {
                 case 'A': // Up arrow
                     if (selected_record_idx > 0)
-                    {
                         selected_record_idx--;
-                        disable_raw_mode();
-                        clear_screen();
-                        printf("Press \"q\" to quit select mode\n\n");
-                        goto print_records;
-                    }
                     break;
                 case 'B': // Down arrow
-                    selected_record_idx++;
-                    disable_raw_mode();
-                    clear_screen();
-                    printf("Press \"q\" to quit select mode\n\n");
-                    goto print_records;
+                    if (selected_record_idx < records_size_max)
+                        selected_record_idx++;
                     break;
                 }
             }
         }
-
-        if (ch == 'q')
+        else if (is_backspace_char(ch))
         {
-            disable_raw_mode();
-            clear_screen();
-            print_initial_screen();
-            break;
+            if (i > 0)
+                --i;
+            search_str[i] = '\0';
         }
+        else
+        {
+            search_str[i++] = ch;
+            search_str[i] = '\0';
+        }
+
+        clear_screen();
+
+        printf("Search: %s\n\n", search_str);
+        records_size = search_records(search_str, records_size_max, records);
+        print_records(records, records_size, selected_record_idx);
+
+        set_cursor_position(0, 8 + i + 1);
+        show_cursor();
     }
+
+    search_str[i] = '\0';
+
+    clear_screen();
+    printf("Search: %s\n\n", search_str);
+    print_records(records, records_size, selected_record_idx);
+
+    disable_raw_mode();
 }
 
 void print_initial_screen()
@@ -219,10 +226,4 @@ void print_initial_screen()
     printf("> (s) search\n");
     printf("> (q) quit\n");
     printf("\n");
-}
-
-void clear_screen()
-{
-    printf("\e[1;1H\e[2J");
-    fflush(stdout);
 }

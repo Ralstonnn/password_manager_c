@@ -22,7 +22,7 @@ int search_records(char *str, int size, struct account_record *records)
     file = fopen(FILE_PATH, "r");
 
     if (!file)
-        return 1;
+        return 0;
 
     int i = 0;
     int line_len = USERNAME_BUFFER_SIZE * 2 + PASSWORD_BUFFER_SIZE;
@@ -37,5 +37,5 @@ int search_records(char *str, int size, struct account_record *records)
     }
 
     fclose(file);
-    return 0;
+    return i;
 }

@@ -42,6 +42,16 @@ int is_end_of_string_char(char ch)
     return ch == EOF || ch == '\0' || ch == '\n';
 }
 
+int is_backspace_char(char ch)
+{
+    return ch == '\b' || ch == 127;
+}
+
+int is_english_letter(char ch)
+{
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
 int get_str_length(char *str)
 {
     int len = 0;
@@ -149,4 +159,24 @@ void print_by_chars(char *str)
         printf("\\0");
     else if (*str == EOF)
         printf("EOF");
+}
+
+void clear_screen()
+{
+    printf("\033[H\033[J");
+}
+
+void set_cursor_position(int row, int col)
+{
+    printf("\033[%d;%dH", row, col);
+}
+
+void hide_cursor()
+{
+    printf("\033[?25l");
+}
+
+void show_cursor()
+{
+    printf("\033[?25h");
 }

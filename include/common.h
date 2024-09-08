@@ -28,10 +28,17 @@ void print_by_chars(char *str);
 
 void trim(char *str, char ch);
 void trim_whitespaces(char *str);
+int is_backspace_char(char ch);
+int is_english_letter(char ch);
 
 void copy_str(char *src, char *dest);
 int get_str_length(char *str);
 int is_end_of_string_char(char ch);
 int is_string_empty(char *str);
+
+void clear_screen();
+void set_cursor_position(int row, int col);
+void hide_cursor();
+void show_cursor();
 
 #endif
