@@ -42,6 +42,15 @@ int is_end_of_string_char(char ch)
     return ch == EOF || ch == '\0' || ch == '\n';
 }
 
+int is_char_int_string(char *str, char ch)
+{
+    while (!is_end_of_string_char(*str++))
+        if (*str == ch)
+            return 1;
+
+    return 0;
+}
+
 int is_backspace_char(char ch)
 {
     return ch == '\b' || ch == 127;
@@ -135,17 +144,6 @@ int get_string_no_whitespaces(char *str, int size)
 
     str[len++] = '\0';
     return len;
-}
-
-int are_equal_strings(char *search, char *other)
-{
-    while (!is_end_of_string_char(*search))
-        if (*search++ != *other++)
-            return 0;
-    if (*search != *other)
-        return 0;
-
-    return 1;
 }
 
 void print_by_chars(char *str)

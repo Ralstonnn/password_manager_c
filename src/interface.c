@@ -2,6 +2,7 @@
 #include "common.h"
 #include "fs.h"
 #include "terminal.h"
+#include "search.h"
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -173,7 +174,7 @@ void show_search_records()
                         selected_record_idx--;
                     break;
                 case 'B': // Down arrow
-                    if (selected_record_idx < records_size_max)
+                    if (selected_record_idx < records_size - 1)
                         selected_record_idx++;
                     break;
                 }
@@ -194,7 +195,7 @@ void show_search_records()
         clear_screen();
 
         printf("Search: %s\n\n", search_str);
-        records_size = search_records(search_str, records_size_max, records);
+        records_size = search_records(string_fuzzy_find, search_str, records_size_max, records);
         print_records(records, records_size, selected_record_idx);
 
         set_cursor_position(0, 8 + i + 1);

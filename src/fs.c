@@ -15,7 +15,7 @@ int save_record(struct account_record record)
     return 0;
 }
 
-int search_records(char *str, int size, struct account_record *records)
+int search_records(int (*search_algo)(char *line, char *search_str), char *str, int size, struct account_record *records)
 {
     FILE *file;
 
@@ -32,7 +32,7 @@ int search_records(char *str, int size, struct account_record *records)
     while (fgets(line, line_len, file) != NULL && i < size)
     {
         current_record = parse_string_to_record(line);
-        if (are_equal_strings(str, current_record.name))
+        if (search_algo(current_record.name, str))
             records[i++] = current_record;
     }
 

@@ -22,7 +22,7 @@ int is_record_empty(struct account_record record);
 
 int get_string(char *str, int size);
 int get_string_no_whitespaces(char *str, int size);
-int are_equal_strings(char *search, char *other);
+int is_char_int_string(char *str, char ch);
 
 void print_by_chars(char *str);
 

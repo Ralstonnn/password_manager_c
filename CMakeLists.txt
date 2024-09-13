@@ -10,4 +10,4 @@ project(PasswordManagerApp)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # add the executable
-add_executable(PasswordManager src/main.c src/common.c src/fs.c src/interface.c src/terminal.c)
+add_executable(PasswordManager src/main.c src/common.c src/fs.c src/interface.c src/terminal.c src/search.c)
