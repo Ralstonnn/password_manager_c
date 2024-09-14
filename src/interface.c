@@ -3,6 +3,7 @@
 #include "fs.h"
 #include "terminal.h"
 #include "search.h"
+#include "copy_to_clipboard.h"
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -15,6 +16,8 @@ static const char HEADER[HEADER_HEIGHT][HEADER_LENGTH] = {
 void print_initial_screen();
 struct account_record create_record();
 void show_search_records();
+void show_selected_record_screen(struct account_record record);
+void print_selected_record_screen(struct account_record record, int is_password_hidden);
 
 void print_interface()
 {
@@ -204,11 +207,83 @@ void show_search_records()
 
     search_str[i] = '\0';
 
+    if (ch == '\n')
+    {
+        show_selected_record_screen(records[selected_record_idx]);
+    }
+    else
+    {
+        clear_screen();
+        print_initial_screen();
+        disable_raw_mode();
+    }
+}
+
+void print_selected_record_screen(struct account_record record, int is_password_hidden)
+{
+    printf("Record selected \n\n");
+    printf("Press \"u\" to copy username\n");
+    printf("Press \"p\" to copy password\n");
+    printf("Press \"h\" to show/hide password\n");
+    printf("Press \"q\" to quit to initial screen\n\n");
+
+    printf("Record name: %s\n", record.name);
+    printf("Username   : %s\n", record.username);
+
+    if (is_password_hidden)
+    {
+        printf("Password   : ");
+        for (int i = 0; !is_end_of_string_char(record.password[i]); i++)
+            printf("*");
+        printf("\n");
+    }
+    else
+    {
+        printf("Password   : %s\n", record.password);
+    }
+    printf("\n");
+}
+
+void show_selected_record_screen(struct account_record record)
+{
+    enable_raw_mode();
     clear_screen();
-    printf("Search: %s\n\n", search_str);
-    print_records(records, records_size, selected_record_idx);
+
+    int is_password_hidden = 1;
+
+    print_selected_record_screen(record, is_password_hidden);
+
+    char ch;
+
+    while ((ch = getchar()) != 'q')
+    {
+        switch (ch)
+        {
+        case 'h':
+            is_password_hidden = !is_password_hidden;
+            clear_screen();
+            print_selected_record_screen(record, is_password_hidden);
+            break;
+        case 'u':
+            copy_to_clipboard(record.username, USERNAME_BUFFER_SIZE);
+            clear_screen();
+            print_selected_record_screen(record, is_password_hidden);
+            printf("Username copied");
+            break;
+        case 'p':
+            copy_to_clipboard(record.password, PASSWORD_BUFFER_SIZE);
+            clear_screen();
+            print_selected_record_screen(record, is_password_hidden);
+            printf("Password copied");
+            break;
+        default:
+            break;
+        }
+    }
 
     disable_raw_mode();
+    clear_screen();
+    print_initial_screen();
 }
 
 void print_initial_screen()
