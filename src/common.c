@@ -63,10 +63,14 @@ int is_english_letter(char ch)
 
 int get_str_length(char *str)
 {
+    if (is_end_of_string_char(*str)) {
+        return 0;
+    }
+
     int len = 0;
     while (!is_end_of_string_char(str[len]))
         len++;
-    len++;
+
     return len;
 }
 

@@ -4,6 +4,7 @@
 #include "terminal.h"
 #include "search.h"
 #include "copy_to_clipboard.h"
+#include "password_generator.h"
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -18,6 +19,7 @@ struct account_record create_record();
 void show_search_records();
 void show_selected_record_screen(struct account_record record);
 void print_selected_record_screen(struct account_record record, int is_password_hidden);
+void show_generate_random_password();
 
 void print_interface()
 {
@@ -44,6 +46,9 @@ void print_interface()
             break;
         case 's':
             show_search_records();
+            break;
+        case 'r':
+            show_generate_random_password();
             break;
         case 'q':
         case EOF:
@@ -286,6 +291,17 @@ void show_selected_record_screen(struct account_record record)
     print_initial_screen();
 }
 
+void show_generate_random_password()
+{
+    char password[PASSWORD_BUFFER_SIZE];
+    for (int i = 0; i < PASSWORD_BUFFER_SIZE; i++)
+        password[i] = '\0';
+    
+    generate_password(password, 20);
+    printf("%s\n", password);
+    char ch;
+}
+
 void print_initial_screen()
 {
     clear_screen();
@@ -300,6 +316,7 @@ void print_initial_screen()
     printf("\nChoose an option\n");
     printf("> (c) create\n");
     printf("> (s) search\n");
+    printf("> (r) generate random password\n");
     printf("> (q) quit\n");
     printf("\n");
 }
