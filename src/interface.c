@@ -5,6 +5,7 @@
 #include "search.h"
 #include "copy_to_clipboard.h"
 #include "password_generator.h"
+#include "validations.h"
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -296,10 +297,20 @@ void show_generate_random_password()
     char password[PASSWORD_BUFFER_SIZE];
     for (int i = 0; i < PASSWORD_BUFFER_SIZE; i++)
         password[i] = '\0';
-    
-    generate_password(password, 20);
-    printf("%s\n", password);
-    char ch;
+
+    char input[4];
+    int number;
+
+    do
+    {
+        printf("\nEnter number of characters a password should have (255): ");
+        get_string(input, 4);
+        number = string_to_int(input);
+    } while (!is_number_string(input) || number > PASSWORD_BUFFER_SIZE - 1);
+    printf("\n");
+
+    generate_password(password, number);
+    printf("%s\n\n", password);
 }
 
 void print_initial_screen()

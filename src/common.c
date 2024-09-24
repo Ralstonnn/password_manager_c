@@ -63,7 +63,8 @@ int is_english_letter(char ch)
 
 int get_str_length(char *str)
 {
-    if (is_end_of_string_char(*str)) {
+    if (is_end_of_string_char(*str))
+    {
         return 0;
     }
 
@@ -124,13 +125,10 @@ int get_string(char *str, int size)
 {
     int len = 0;
 
-    for (char ch; (ch = getchar()) != EOF && ch != '\n';)
-    {
-        if (len < size - 1)
-            str[len++] = ch;
-    }
+    for (char ch; (ch = getchar()) != EOF && ch != '\n' && len < size - 1; len++)
+        str[len] = ch;
 
-    str[len++] = '\0';
+    str[len] = '\0';
     return len;
 }
 
@@ -138,15 +136,14 @@ int get_string_no_whitespaces(char *str, int size)
 {
     int len = 0;
 
-    for (char ch; (ch = getchar()) != EOF && ch != '\n';)
+    for (char ch; (ch = getchar()) != EOF && ch != '\n' && len < size - 1; len++)
     {
         if (ch == ' ')
             continue;
-        if (len < size - 1)
-            str[len++] = ch;
+        str[len] = ch;
     }
 
-    str[len++] = '\0';
+    str[len] = '\0';
     return len;
 }
 
@@ -161,6 +158,17 @@ void print_by_chars(char *str)
         printf("\\0");
     else if (*str == EOF)
         printf("EOF");
+}
+
+int string_to_int(char *str)
+{
+    int result = 0;
+    while (!is_end_of_string_char(*str))
+    {
+        result += *str++ - '0';
+        result *= 10;
+    }
+    return result / 10;
 }
 
 void clear_screen()

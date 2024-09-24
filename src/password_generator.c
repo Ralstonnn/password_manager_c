@@ -14,4 +14,5 @@ void generate_password(char *str, int len)
         while (is_end_of_string_char(str[i]) || !validate_password(str))
             str[i] = rand();
     }
+    str[i] = '\0';
 }

@@ -35,6 +35,7 @@ void copy_str(char *src, char *dest);
 int get_str_length(char *str);
 int is_end_of_string_char(char ch);
 int is_string_empty(char *str);
+int string_to_int(char *str);
 
 void clear_screen();
 void set_cursor_position(int row, int col);
