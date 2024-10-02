@@ -298,19 +298,52 @@ void show_generate_random_password()
     for (int i = 0; i < PASSWORD_BUFFER_SIZE; i++)
         password[i] = '\0';
 
+    char ch;
     char input[4];
     int number;
 
-    do
+    while (1)
     {
-        printf("\nEnter number of characters a password should have (255): ");
-        get_string(input, 4);
-        number = string_to_int(input);
-    } while (!is_number_string(input) || number > PASSWORD_BUFFER_SIZE - 1);
-    printf("\n");
+        disable_raw_mode();
+        clear_screen();
 
-    generate_password(password, number);
-    printf("%s\n\n", password);
+        do
+        {
+            printf("Enter number of characters a password should have (255): ");
+            get_string(input, 4);
+            number = string_to_int(input);
+        } while (!is_number_string(input) || number > PASSWORD_BUFFER_SIZE - 1);
+
+        generate_password(password, number);
+        enable_raw_mode();
+        ch = '\0';
+
+        do
+        {
+            clear_screen();
+            printf("Password: %s\n\n", password);
+            printf("(c) to copy password\n");
+            printf("(r) to regenerate password\n");
+            printf("(q) to quit\n\n");
+
+            if (ch == 'c')
+            {
+                copy_to_clipboard(password, PASSWORD_BUFFER_SIZE);
+                printf("Password copied successfully");
+            }
+            else if (ch == 'r')
+            {
+                break;
+            }
+        } while ((ch = getchar()) != 'q');
+
+        if (ch == 'q')
+            break;
+    }
+
+    disable_raw_mode();
+    clear_screen();
+    print_initial_screen();
 }
 
 void print_initial_screen()
