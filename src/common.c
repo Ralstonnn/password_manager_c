@@ -102,14 +102,14 @@ void trim(char *str, char ch)
     char copy[len];
     copy_str(str, copy);
 
-    for (int i = len - 2; i >= 0 && copy[i] == ch; i--, end_trim--)
+    for (int i = len - 1; i >= 0 && copy[i] == ch; i--, end_trim--)
         ;
     for (; start_trim < end_trim && copy[start_trim] == ch; start_trim++)
         ;
 
     for (int i = 0; i < len; i++)
     {
-        if (start_trim + i < end_trim)
+        if (start_trim + i <= end_trim)
             str[i] = copy[start_trim + i];
         else
             str[i] = '\0';
@@ -135,12 +135,13 @@ int get_string(char *str, int size)
 int get_string_no_whitespaces(char *str, int size)
 {
     int len = 0;
+    char ch;
 
-    for (char ch; (ch = getchar()) != EOF && ch != '\n' && len < size - 1; len++)
+    while ((ch = getchar()) != EOF && ch != '\n' && len < size - 1)
     {
         if (ch == ' ')
             continue;
-        str[len] = ch;
+        str[len++] = ch;
     }
 
     str[len] = '\0';

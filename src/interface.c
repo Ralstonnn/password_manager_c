@@ -27,18 +27,11 @@ void print_interface()
     char ch;
 
     print_initial_screen();
-    printf(": ");
 
     while (1)
     {
-        scanf("%s", &ch);
-        char ch2 = getchar();
-
-        if (ch2 == EOF)
-        {
-            clear_screen();
-            break;
-        }
+        enable_raw_mode();
+        ch = getchar();
 
         switch (ch)
         {
@@ -59,18 +52,19 @@ void print_interface()
             break;
         }
 
-        if (ch != 'q' && ch != EOF)
-            printf(": ");
-        else
+        if (ch == 'q' || ch == EOF)
         {
             clear_screen();
             break;
         }
     }
+
+    disable_raw_mode();
 }
 
 struct account_record create_record()
 {
+    disable_raw_mode();
     clear_screen();
     struct account_record record = create_empty_account_record();
 
