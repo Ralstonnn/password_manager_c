@@ -10,7 +10,11 @@ struct account_record create_empty_account_record()
 void fill_arrays_with_empty_records(struct account_record *records, int size)
 {
     for (int i = 0; i < size; i++)
-        records[i] = create_empty_account_record();
+    {
+        records[i].name[0] = '\0';
+        records[i].username[0] = '\0';
+        records[i].password[0] = '\0';
+    }
 }
 
 struct account_record parse_string_to_record(char *str)
@@ -35,6 +39,14 @@ struct account_record parse_string_to_record(char *str)
 int is_record_empty(struct account_record record)
 {
     return is_string_empty(record.name) && is_string_empty(record.username) && is_string_empty(record.password);
+}
+
+int get_records_size(struct account_record *records, int max_size)
+{
+    int i;
+    for (i = 0; !is_record_empty(records[i]); i++)
+        ;
+    return i;
 }
 
 int is_end_of_string_char(char ch)
@@ -90,6 +102,24 @@ int is_string_empty(char *str)
             return 0;
     }
 
+    return 1;
+}
+
+int are_equal_strings(char *str1, char *str2)
+{
+    int i = 0;
+    while (!is_end_of_string_char(str1[i]) && !is_end_of_string_char(str2[i]))
+    {
+        if (str1[i] != str2[i])
+        {
+            return 0;
+        }
+        i++;
+    }
+    if (str1[i] != str2[i])
+    {
+        return 0;
+    }
     return 1;
 }
 

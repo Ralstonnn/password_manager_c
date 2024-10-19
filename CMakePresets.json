@@ -1,27 +1,28 @@
 {
-    "version": 2,
-    "configurePresets": [
-        {
-            "name": "debug",
-            "displayName": "Debug",
-            "binaryDir": "${sourceDir}/build_debug",
-            "generator": "Unix Makefiles",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Wpedantic"
-            }
-        },
-        {
-            "name": "release",
-            "displayName": "Release",
-            "binaryDir": "${sourceDir}/build",
-            "generator": "Unix Makefiles",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_CXX_FLAGS_INIT": "-Wall"
-            }
-        }
-    ]
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "binaryDir": "${sourceDir}/build_debug",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Wpedantic -g3",
+        "CMAKE_C_FLAGS_DEBUG": "-g3"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release",
+      "binaryDir": "${sourceDir}/build",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_FLAGS_INIT": "-Wall"
+      }
+    }
+  ]
 }

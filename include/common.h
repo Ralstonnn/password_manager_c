@@ -19,6 +19,7 @@ struct account_record create_empty_account_record();
 void fill_arrays_with_empty_records(struct account_record *records, int size);
 struct account_record parse_string_to_record(char *str);
 int is_record_empty(struct account_record record);
+int get_records_size(struct account_record *records, int max_size);
 
 int get_string(char *str, int size);
 int get_string_no_whitespaces(char *str, int size);
@@ -36,6 +37,7 @@ int get_str_length(char *str);
 int is_end_of_string_char(char ch);
 int is_string_empty(char *str);
 int string_to_int(char *str);
+int are_equal_strings(char *str1, char *str2);
 
 void clear_screen();
 void set_cursor_position(int row, int col);

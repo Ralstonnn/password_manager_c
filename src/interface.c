@@ -6,6 +6,7 @@
 #include "copy_to_clipboard.h"
 #include "password_generator.h"
 #include "validations.h"
+#include "db.h"
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -158,7 +159,6 @@ void show_search_records()
     records_size_max = 5;
 
     struct account_record records[records_size_max];
-    fill_arrays_with_empty_records(records, records_size_max);
 
     while (!is_end_of_string_char((ch = getchar())) && i < 55)
     {
@@ -198,7 +198,9 @@ void show_search_records()
         clear_screen();
 
         printf("Search: %s\n\n", search_str);
-        records_size = search_records(string_fuzzy_find, search_str, records_size_max, records);
+        fill_arrays_with_empty_records(records, records_size_max);
+        search_records_db(records, search_str, records_size_max);
+        records_size = get_records_size(records, records_size_max);
         print_records(records, records_size, selected_record_idx);
 
         set_cursor_position(0, 8 + i + 1);
