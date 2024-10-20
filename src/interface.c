@@ -2,7 +2,6 @@
 #include "common.h"
 #include "fs.h"
 #include "terminal.h"
-#include "search.h"
 #include "copy_to_clipboard.h"
 #include "password_generator.h"
 #include "validations.h"
