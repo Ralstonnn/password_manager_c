@@ -1,11 +1,10 @@
-#include <stdio.h>
 #include "common.h"
-#include "fs.h"
-#include "terminal.h"
 #include "copy_to_clipboard.h"
-#include "password_generator.h"
-#include "validations.h"
 #include "db.h"
+#include "password_generator.h"
+#include "terminal.h"
+#include "validations.h"
+#include <stdio.h>
 
 #define HEADER_LENGTH 40
 #define HEADER_HEIGHT 3
@@ -16,25 +15,24 @@ static const char HEADER[HEADER_HEIGHT][HEADER_LENGTH] = {
     "########################################"};
 
 void print_initial_screen();
-struct account_record create_record();
+void create_record();
 void show_search_records();
 void show_selected_record_screen(struct account_record record);
-void print_selected_record_screen(struct account_record record, int is_password_hidden);
+void print_selected_record_screen(struct account_record record,
+                                  int is_password_hidden);
 void show_generate_random_password();
+int get_random_password_length(char *message);
 
-void print_interface()
-{
+void print_interface() {
     char ch;
 
     print_initial_screen();
 
-    while (1)
-    {
+    while (1) {
         enable_raw_mode();
         ch = getchar();
 
-        switch (ch)
-        {
+        switch (ch) {
         case 'c':
             create_record();
             break;
@@ -52,8 +50,7 @@ void print_interface()
             break;
         }
 
-        if (ch == 'q' || ch == EOF)
-        {
+        if (ch == 'q' || ch == EOF) {
             clear_screen();
             break;
         }
@@ -62,8 +59,7 @@ void print_interface()
     disable_raw_mode();
 }
 
-struct account_record create_record()
-{
+void create_record() {
     disable_raw_mode();
     clear_screen();
     struct account_record record = create_empty_account_record();
@@ -75,23 +71,19 @@ struct account_record create_record()
     printf("username (%d): ", USERNAME_BUFFER_SIZE - 1);
     get_string_no_whitespaces(record.username, USERNAME_BUFFER_SIZE);
 
-    printf("password (%d): ", PASSWORD_BUFFER_SIZE - 1);
+    printf("password (%d) <leave empty to generate random password>: ",
+           PASSWORD_BUFFER_SIZE - 1);
     char ch;
     int i = 0;
     enable_raw_mode();
-    while (!is_end_of_string_char((ch = getchar())))
-    {
-        if (is_backspace_char(ch))
-        {
-            if (i > 0)
-            {
+    while (!is_end_of_string_char((ch = getchar()))) {
+        if (is_backspace_char(ch)) {
+            if (i > 0) {
                 --i;
                 printf("\b \b");
             }
             record.password[i] = '\0';
-        }
-        else
-        {
+        } else {
             record.password[i++] = ch;
             printf("*");
         }
@@ -100,52 +92,44 @@ struct account_record create_record()
 
     printf("\n\n");
 
-    // If all fields are empty - skip saving
-    if (is_string_empty(record.name) && is_string_empty(record.username) && is_string_empty(record.password))
-    {
-        printf("To save record provide at least one field\n");
+    if (is_string_empty(record.name) || is_string_empty(record.username)) {
+        clear_screen();
+        printf("To save record provide name and username\n");
+    } else if (is_string_empty(record.password)) {
+        clear_screen();
+        disable_raw_mode();
+        generate_password(record.password, get_random_password_length(NULL));
+        enable_raw_mode();
     }
-    else
-    {
 
-        int is_saved = save_record(record);
+    if (!is_string_empty(record.password) && !is_string_empty(record.name) &&
+        !is_string_empty(record.username)) {
+        int is_saved = save_record_db(record);
+        clear_screen();
         if (is_saved == 0)
-            printf("Record saved successfully\n");
+            show_selected_record_screen(record);
         else
             printf("Something went wrong\n");
     }
-
-    printf("Press any key to continue\n\n");
-    getchar();
-    disable_raw_mode();
-
-    print_initial_screen();
-
-    return record;
 }
 
-void print_records(struct account_record *records, int records_size, int selected_record_idx)
-{
-    for (int i = 0; i < records_size; i++)
-    {
+void print_records(struct account_record *records, int records_size,
+                   int selected_record_idx) {
+    for (int i = 0; i < records_size; i++) {
         if (is_record_empty(records[i]))
             continue;
 
-        if (i == selected_record_idx)
-        {
+        if (i == selected_record_idx) {
             printf(">  Name: %s\n", records[i].name);
             printf("   Username: %s\n\n", records[i].username);
-        }
-        else
-        {
+        } else {
             printf("   Name: %s\n", records[i].name);
             printf("   Username: %s\n\n", records[i].username);
         }
     }
 }
 
-void show_search_records()
-{
+void show_search_records() {
     clear_screen();
     enable_raw_mode();
     printf("Search: ");
@@ -159,18 +143,14 @@ void show_search_records()
 
     struct account_record records[records_size_max];
 
-    while (!is_end_of_string_char((ch = getchar())) && i < 55)
-    {
+    while (!is_end_of_string_char((ch = getchar())) && i < 55) {
         hide_cursor();
 
-        if (ch == '\x1b')
-        {
+        if (ch == '\x1b') {
             ch = getchar();
-            if (ch == '[')
-            {
+            if (ch == '[') {
                 ch = getchar();
-                switch (ch)
-                {
+                switch (ch) {
                 case 'A': // Up arrow
                     if (selected_record_idx > 0)
                         selected_record_idx--;
@@ -181,15 +161,11 @@ void show_search_records()
                     break;
                 }
             }
-        }
-        else if (is_backspace_char(ch))
-        {
+        } else if (is_backspace_char(ch)) {
             if (i > 0)
                 --i;
             search_str[i] = '\0';
-        }
-        else
-        {
+        } else {
             search_str[i++] = ch;
             search_str[i] = '\0';
         }
@@ -208,20 +184,17 @@ void show_search_records()
 
     search_str[i] = '\0';
 
-    if (ch == '\n')
-    {
+    if (ch == '\n') {
         show_selected_record_screen(records[selected_record_idx]);
-    }
-    else
-    {
+    } else {
         clear_screen();
         print_initial_screen();
         disable_raw_mode();
     }
 }
 
-void print_selected_record_screen(struct account_record record, int is_password_hidden)
-{
+void print_selected_record_screen(struct account_record record,
+                                  int is_password_hidden) {
     printf("Record selected \n\n");
     printf("Press \"u\" to copy username\n");
     printf("Press \"p\" to copy password\n");
@@ -231,22 +204,18 @@ void print_selected_record_screen(struct account_record record, int is_password_
     printf("Record name: %s\n", record.name);
     printf("Username   : %s\n", record.username);
 
-    if (is_password_hidden)
-    {
+    if (is_password_hidden) {
         printf("Password   : ");
         for (int i = 0; !is_end_of_string_char(record.password[i]); i++)
             printf("*");
         printf("\n");
-    }
-    else
-    {
+    } else {
         printf("Password   : %s\n", record.password);
     }
     printf("\n");
 }
 
-void show_selected_record_screen(struct account_record record)
-{
+void show_selected_record_screen(struct account_record record) {
     enable_raw_mode();
     clear_screen();
 
@@ -256,10 +225,8 @@ void show_selected_record_screen(struct account_record record)
 
     char ch;
 
-    while ((ch = getchar()) != 'q')
-    {
-        switch (ch)
-        {
+    while ((ch = getchar()) != 'q') {
+        switch (ch) {
         case 'h':
             is_password_hidden = !is_password_hidden;
             clear_screen();
@@ -287,47 +254,50 @@ void show_selected_record_screen(struct account_record record)
     print_initial_screen();
 }
 
-void show_generate_random_password()
-{
+int get_random_password_length(char *message) {
+    char input[4];
+    int number;
+    do {
+        if (message == NULL) {
+            printf("Enter number of characters a password should have "
+                   "(255): ");
+        } else {
+            printf("%s", message);
+        }
+        get_string(input, 4);
+        number = string_to_int(input);
+    } while (!is_number_string(input) || number > PASSWORD_BUFFER_SIZE - 1);
+    return number;
+}
+
+void show_generate_random_password() {
     char password[PASSWORD_BUFFER_SIZE];
     for (int i = 0; i < PASSWORD_BUFFER_SIZE; i++)
         password[i] = '\0';
 
     char ch;
-    char input[4];
     int number;
 
-    while (1)
-    {
+    while (1) {
         disable_raw_mode();
         clear_screen();
 
-        do
-        {
-            printf("Enter number of characters a password should have (255): ");
-            get_string(input, 4);
-            number = string_to_int(input);
-        } while (!is_number_string(input) || number > PASSWORD_BUFFER_SIZE - 1);
-
+        number = get_random_password_length(NULL);
         generate_password(password, number);
         enable_raw_mode();
         ch = '\0';
 
-        do
-        {
+        do {
             clear_screen();
             printf("Password: %s\n\n", password);
             printf("(c) to copy password\n");
             printf("(r) to regenerate password\n");
             printf("(q) to quit\n\n");
 
-            if (ch == 'c')
-            {
+            if (ch == 'c') {
                 copy_to_clipboard(password, PASSWORD_BUFFER_SIZE);
                 printf("Password copied successfully");
-            }
-            else if (ch == 'r')
-            {
+            } else if (ch == 'r') {
                 break;
             }
         } while ((ch = getchar()) != 'q');
@@ -341,13 +311,10 @@ void show_generate_random_password()
     print_initial_screen();
 }
 
-void print_initial_screen()
-{
+void print_initial_screen() {
     clear_screen();
-    for (int i = 0; i < HEADER_HEIGHT; i++)
-    {
-        for (int j = 0; j < HEADER_LENGTH; j++)
-        {
+    for (int i = 0; i < HEADER_HEIGHT; i++) {
+        for (int j = 0; j < HEADER_LENGTH; j++) {
             printf("%c", HEADER[i][j]);
         }
         printf("\n");
