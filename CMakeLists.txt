@@ -12,6 +12,6 @@ find_package(SQLite3 REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # add the executable
-add_executable(PasswordManager src/main.c src/common.c src/os.c src/fs.c src/db.c src/interface.c src/terminal.c src/search.c src/copy_to_clipboard.c src/password_generator.c src/validations.c)
+add_executable(PasswordManager src/main.c src/common.c src/os.c src/encryption.c src/fs.c src/db.c src/interface.c src/terminal.c src/search.c src/copy_to_clipboard.c src/password_generator.c src/validations.c)
 
 target_link_libraries(PasswordManager SQLite::SQLite3)
