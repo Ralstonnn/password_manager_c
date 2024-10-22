@@ -25,5 +25,6 @@
 #endif
 
 const char *get_platform_name();
+int is_wsl();
 
 #endif
