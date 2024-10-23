@@ -29,3 +29,7 @@ cmake --preset debug && cd build_debug && make
 ## How to use 
 
 To start the app run ```password-manager``` in the terminal
+
+## To develop
+
+Install ```clang-format``` and add git hooks ```git config --local core.hooksPath .githooks/```
