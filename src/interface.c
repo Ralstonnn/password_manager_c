@@ -1,6 +1,7 @@
 #include "common.h"
 #include "copy_to_clipboard.h"
 #include "db.h"
+#include "encryption.h"
 #include "password_generator.h"
 #include "terminal.h"
 #include "validations.h"
@@ -210,6 +211,7 @@ void print_selected_record_screen(struct account_record record,
             printf("*");
         printf("\n");
     } else {
+        encrypt_str(record.password);
         printf("Password   : %s\n", record.password);
     }
     printf("\n");

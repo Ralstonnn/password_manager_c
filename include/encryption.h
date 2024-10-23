@@ -1,7 +1,7 @@
-#ifndef ENCTYPRION_H
-#define ENCTYPRION_H
+#ifndef ENCRYPTION_H
+#define ENCRYPTION_H
 
-void encrypt_str(char *str);
-void dencrypt_str(char *str);
+char *encrypt_str(char *str);
+void decrypt_str(char *str);
 
 #endif

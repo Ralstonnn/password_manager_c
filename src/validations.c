@@ -1,8 +1,7 @@
 #include <regex.h>
 #include <stdio.h>
 
-int validate_with_regexp(char *str, char *pattern)
-{
+int validate_with_regexp(char *str, char *pattern) {
     regex_t regex;
     int result;
 
@@ -22,14 +21,12 @@ int validate_with_regexp(char *str, char *pattern)
     return result;
 }
 
-int validate_password(char *str)
-{
+int validate_password(char *str) {
     char pattern[] = "^[A-Za-z0-9!@#$%&*^]+$";
     return validate_with_regexp(str, pattern);
 }
 
-int is_number_string(char *str)
-{
+int is_number_string(char *str) {
     char pattern[] = "^[0-9]+$";
     return validate_with_regexp(str, pattern);
 }

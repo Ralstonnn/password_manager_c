@@ -8,8 +8,7 @@
 
 #define FILE_PATH "../test.txt"
 
-struct account_record
-{
+struct account_record {
     char name[USERNAME_BUFFER_SIZE];
     char username[USERNAME_BUFFER_SIZE];
     char password[PASSWORD_BUFFER_SIZE];

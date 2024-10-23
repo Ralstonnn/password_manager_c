@@ -6,8 +6,7 @@
 
 struct account_record split(char *str);
 
-int main()
-{
+int main() {
     // Called for rand() to work
     srand(time(0));
 

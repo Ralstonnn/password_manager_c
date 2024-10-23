@@ -5,7 +5,7 @@
 ### Needed libraries
 
 ```sh
-sqlite3 libsqlite3-dev
+sqlite3 libsqlite3-dev libssl-dev
 ```
 
 #### For copy to work on linux install app for your display manager

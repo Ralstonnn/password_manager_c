@@ -1,7 +1,7 @@
-void encrypt_str(char *str) {
-    
-}
+#include <openssl/hmac.h>
+#include <stdio.h>
+#include <string.h>
 
-void dencrypt_str(char *str) {
+char *encrypt_str(char *str) {}
 
-}
+void decrypt_str(char *str) {}

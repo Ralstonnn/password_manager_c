@@ -1,8 +1,7 @@
-#include <stdio.h>
 #include "common.h"
+#include <stdio.h>
 
-int save_record(struct account_record record)
-{
+int save_record(struct account_record record) {
     FILE *file;
     file = fopen(FILE_PATH, "a");
 
@@ -15,8 +14,8 @@ int save_record(struct account_record record)
     return 0;
 }
 
-int search_records(int (*search_algo)(char *line, char *search_str), char *str, int size, struct account_record *records)
-{
+int search_records(int (*search_algo)(char *line, char *search_str), char *str,
+                   int size, struct account_record *records) {
     FILE *file;
 
     file = fopen(FILE_PATH, "r");
@@ -29,8 +28,7 @@ int search_records(int (*search_algo)(char *line, char *search_str), char *str, 
     char line[line_len];
     struct account_record current_record;
 
-    while (fgets(line, line_len, file) != NULL && i < size)
-    {
+    while (fgets(line, line_len, file) != NULL && i < size) {
         current_record = parse_string_to_record(line);
         if (search_algo(current_record.name, str))
             records[i++] = current_record;
