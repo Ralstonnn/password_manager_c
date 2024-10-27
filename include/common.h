@@ -8,8 +8,8 @@
 
 #define FILE_PATH "../test.txt"
 
-struct account_record
-{
+struct account_record {
+    int id;
     char name[USERNAME_BUFFER_SIZE];
     char username[USERNAME_BUFFER_SIZE];
     char password[PASSWORD_BUFFER_SIZE];
@@ -43,5 +43,6 @@ void clear_screen();
 void set_cursor_position(int row, int col);
 void hide_cursor();
 void show_cursor();
+void print_in_bibary(char *str, int len);
 
 #endif

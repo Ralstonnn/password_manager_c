@@ -12,11 +12,12 @@
 #elif defined(_WIN64)
 #define PLATFORM_NAME OS_WINDOWS // Windows
 #elif defined(__CYGWIN__) && !defined(_WIN32)
-#define PLATFORM_NAME OS_WINDOWS // Windows (Cygwin POSIX under Microsoft Window)
+#define PLATFORM_NAME                                                          \
+    OS_WINDOWS // Windows (Cygwin POSIX under Microsoft Window)
 #elif defined(__linux__)
 #define PLATFORM_NAME                                                          \
     OS_LINUX // Debian, Ubuntu, Gentoo, Fedora, openSUSE, RedHat, Centos and
-            // other
+// other
 #elif defined(__unix__) || !defined(__APPLE__) && defined(__MACH__)
 #elif TARGET_OS_MAC == 1
 #define PLATFORM_NAME OS_MAC // Apple OSX
@@ -25,5 +26,6 @@
 #endif
 
 const char *get_platform_name();
+int is_wsl();
 
 #endif

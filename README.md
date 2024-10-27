@@ -5,7 +5,7 @@
 ### Needed libraries
 
 ```sh
-sqlite3 libsqlite3-dev
+sqlite3 libsqlite3-dev libssl-dev
 ```
 
 #### For copy to work on linux install app for your display manager
@@ -29,3 +29,7 @@ cmake --preset debug && cd build_debug && make
 ## How to use 
 
 To start the app run ```password-manager``` in the terminal
+
+## To develop
+
+Install ```clang-format``` and add git hooks ```git config --local core.hooksPath .githooks/```

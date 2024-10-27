@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 struct account_record create_empty_account_record() {
-    struct account_record record = {"\0", "\0", "\0"};
+    struct account_record record = {-1, "\0", "\0", "\0"};
     return record;
 }
 
@@ -179,3 +179,20 @@ void set_cursor_position(int row, int col) { printf("\033[%d;%dH", row, col); }
 void hide_cursor() { printf("\033[?25l"); }
 
 void show_cursor() { printf("\033[?25h"); }
+
+void print_in_bibary(char *str, int len) {
+    // Equals 10000000 in binary
+    int mask = 0x80;
+
+    for (int i = 0; i < len; i++) {
+        char current = str[i];
+        for (int j = 0; j < 8; j++) {
+            int bit = (current & mask) ? 1 : 0;
+            current <<= 1;
+            printf("%i", bit);
+        }
+        printf("\n");
+    }
+
+    printf("\n%s\n\n", str);
+}

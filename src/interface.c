@@ -185,6 +185,8 @@ void show_search_records() {
     search_str[i] = '\0';
 
     if (ch == '\n') {
+        get_record_by_id_db(&records[selected_record_idx],
+                            records[selected_record_idx].id);
         show_selected_record_screen(records[selected_record_idx]);
     } else {
         clear_screen();

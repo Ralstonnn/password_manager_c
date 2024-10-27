@@ -3,8 +3,7 @@
 #include <unistd.h>
 
 // Function to disable canonical mode and echo
-void enable_raw_mode()
-{
+void enable_raw_mode() {
     struct termios tty;
     tcgetattr(STDIN_FILENO, &tty); // Get current terminal settings
 
@@ -14,8 +13,7 @@ void enable_raw_mode()
 }
 
 // Function to restore original terminal settings
-void disable_raw_mode()
-{
+void disable_raw_mode() {
     struct termios tty;
     tcgetattr(STDIN_FILENO, &tty); // Get current terminal settings
 
