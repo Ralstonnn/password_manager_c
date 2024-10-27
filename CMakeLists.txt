@@ -17,3 +17,4 @@ add_executable(PasswordManager src/main.c src/common.c src/os.c src/encryption.c
 
 target_link_libraries(PasswordManager SQLite::SQLite3)
 target_link_libraries(PasswordManager OpenSSL::SSL OpenSSL::Crypto)
+

@@ -1,7 +1,6 @@
 #include "common.h"
 #include "copy_to_clipboard.h"
 #include "db.h"
-#include "encryption.h"
 #include "password_generator.h"
 #include "terminal.h"
 #include "validations.h"
@@ -186,6 +185,8 @@ void show_search_records() {
     search_str[i] = '\0';
 
     if (ch == '\n') {
+        get_record_by_id_db(&records[selected_record_idx],
+                            records[selected_record_idx].id);
         show_selected_record_screen(records[selected_record_idx]);
     } else {
         clear_screen();
@@ -211,7 +212,6 @@ void print_selected_record_screen(struct account_record record,
             printf("*");
         printf("\n");
     } else {
-        encrypt_str(record.password);
         printf("Password   : %s\n", record.password);
     }
     printf("\n");

@@ -1,12 +1,14 @@
 #!/bin/bash
 
-echo "Formatting committed C files"
+echo ""
+echo "> Formatting committed C files"
 
-# GETTING ALL DIFFED .c FILES FROM COMMIT
+# Getting all diffed .c files from commit
 COMMITED_FILES_STR=$(git diff --cached --name-only | grep \\.c)
 
-# SPLITTING GIVEN STRING BY ENTER AND STORING IN AN ARRAY
+# Splitting given string by enter and storing in an array
 readarray -t COMMITED_FILES_ARR_TMP <<<"$COMMITED_FILES_STR"
+
 COMMITED_FILES_ARR=()
 
 # Remove empty strings
@@ -16,13 +18,15 @@ for element in "${COMMITED_FILES_ARR_TMP[@]}"; do
     fi
 done
 
-# FORMATTING FILES FROM AN ARRAY
+# Formatting files from an array
 if [ ${#COMMITED_FILES_ARR[@]} -gt 0 ]; then
     for file in "${COMMITED_FILES_ARR[@]}"; do
         clang-format -i $file
         git add $file
     done
-    echo "C files formatted"
+    echo "> C files formatted"
 else
-    echo "No C files found"
+    echo "> No C files found"
 fi
+
+echo ""

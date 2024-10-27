@@ -1,6 +1,5 @@
 #include "common.h"
 #include "interface.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -11,5 +10,6 @@ int main() {
     srand(time(0));
 
     print_interface();
+
     return 0;
 }

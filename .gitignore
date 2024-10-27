@@ -16,3 +16,5 @@ compile_commands.json
 PasswordManager
 test.txt
 test.db
+iv_test
+key_test

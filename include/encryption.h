@@ -1,7 +1,7 @@
 #ifndef ENCRYPTION_H
 #define ENCRYPTION_H
 
-char *encrypt_str(char *str);
-void decrypt_str(char *str);
+int encrypt_str(unsigned char *message, unsigned char *outbuf);
+int decrypt_str(const char *encoded_msg, unsigned char *outbuf);
 
 #endif
