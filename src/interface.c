@@ -73,24 +73,10 @@ void create_record() {
 
     printf("password (%d) <leave empty to generate random password>: ",
            PASSWORD_BUFFER_SIZE - 1);
-    char ch;
-    int i = 0;
-    enable_raw_mode();
-    while (!is_end_of_string_char((ch = getchar()))) {
-        if (is_backspace_char(ch)) {
-            if (i > 0) {
-                --i;
-                printf("\b \b");
-            }
-            record.password[i] = '\0';
-        } else {
-            record.password[i++] = ch;
-            printf("*");
-        }
-    }
-    record.password[i] = '\0';
-
+    get_password_from_stdin(record.password, PASSWORD_BUFFER_SIZE);
     printf("\n\n");
+
+    enable_raw_mode();
 
     if (is_string_empty(record.name) || is_string_empty(record.username)) {
         clear_screen();

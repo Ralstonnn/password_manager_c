@@ -1,5 +1,6 @@
 #include "common.h"
-#include "password_generator.h"
+#include "terminal.h"
+#include "validations.h"
 #include <openssl/evp.h>
 #include <stdio.h>
 
@@ -11,12 +12,174 @@
 #define KEY_PATH "../key_test"
 #define IV_PATH "../iv_test"
 
+static unsigned char KEY[KEY_LEN + 1], IV[IV_LEN + 1];
 static int BASE64_DECODING_TABLE[80] = {
     62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1,
     -1, -1, -1, -1, -1, -1, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
     -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
     36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+
+int generate_key_and_iv();
+int validate_key_iv();
+
+int encryption_init() {
+    FILE *file_key, *file_iv;
+
+    file_key = fopen(KEY_PATH, "r");
+    file_iv = fopen(IV_PATH, "r");
+
+    if (file_key == NULL || file_iv == NULL) {
+        if (file_key != NULL)
+            fclose(file_key);
+        if (file_iv != NULL)
+            fclose(file_iv);
+
+        return generate_key_and_iv();
+    }
+
+    fgets((char *)KEY, KEY_LEN + 1, file_key);
+    fgets((char *)IV, IV_LEN + 1, file_iv);
+    fclose(file_key);
+    fclose(file_iv);
+
+    if (!validate_key_iv()) {
+        clear_screen();
+        enable_raw_mode();
+
+        printf("Something is wrong with encryption!\nPress (r) to enter the "
+               "password again or any other key to exit\n");
+        char ch = getchar();
+
+        disable_raw_mode();
+
+        if (ch == 'r') {
+            return generate_key_and_iv();
+        } else {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int validate_key_iv() {
+    return get_str_length((char *)KEY) == KEY_LEN &&
+           get_str_length((char *)IV) == IV_LEN;
+}
+
+int save_key_iv_to_file() {
+    FILE *file_key, *file_iv;
+
+    file_key = fopen(KEY_PATH, "w");
+    file_iv = fopen(IV_PATH, "w");
+
+    if (file_key == NULL || file_iv == NULL) {
+        if (file_key != NULL)
+            fclose(file_key);
+        if (file_iv != NULL)
+            fclose(file_iv);
+
+        return 0;
+    }
+
+    fprintf(file_key, "%s", (char *)KEY);
+    fclose(file_key);
+    fprintf(file_iv, "%s", (char *)IV);
+    fclose(file_iv);
+
+    return 1;
+}
+
+int get_password_encryption(char *out, int len) {
+    int pass_len;
+    int is_retry = 0;
+    int is_password_hidden = 1;
+    int is_valid = 1;
+
+    do {
+        clear_screen();
+
+        if (!is_valid) {
+            printf("The password is not valid!\n");
+            printf("Password should not be empty\n");
+            printf("Password can use letters, numbers and characters: "
+                   "!@#$%%&*^\n\n");
+        }
+
+        printf("Enter a password to use for encryption(%i): ",
+               PASSWORD_BUFFER_SIZE - 1);
+        pass_len = get_password_from_stdin(out, len);
+
+        if (!(is_valid = !is_string_empty(out) && validate_password(out)))
+            continue;
+
+        while (1) {
+            clear_screen();
+            printf("Enter a password to use for encryption(%i): ",
+                   PASSWORD_BUFFER_SIZE - 1);
+
+            if (is_password_hidden) {
+                for (int i = 0; i < pass_len; i++)
+                    printf("*");
+            } else {
+                printf("%s", out);
+            }
+
+            printf(
+                "\nPress (h) to show password, (r) to type the password again "
+                "and (enter) to continue\n");
+
+            enable_raw_mode();
+            char ch = getchar();
+
+            if (ch == 'h') {
+                printf("\nEntered password: %s", out);
+                is_password_hidden = !is_password_hidden;
+                is_retry = 0;
+            } else if (ch == 'r') {
+                is_retry = 1;
+                disable_raw_mode();
+                break;
+            } else if (ch == '\n') {
+                is_retry = 0;
+                disable_raw_mode();
+                break;
+            }
+            disable_raw_mode();
+        }
+    } while (is_retry || !is_valid);
+
+    return pass_len;
+}
+
+int generate_key_and_iv() {
+    char password[PASSWORD_BUFFER_SIZE];
+    int pass_len = get_password_encryption(password, PASSWORD_BUFFER_SIZE);
+
+    const EVP_MD *digest = EVP_sha256();
+    int keyiv_len = KEY_LEN + IV_LEN;
+    unsigned char keyiv[keyiv_len];
+
+    if (!PKCS5_PBKDF2_HMAC(password, pass_len, NULL, 0, 1000, digest, keyiv_len,
+                           keyiv)) {
+        return 0;
+    }
+
+    unsigned int i = 0;
+    for (i = 0; i < KEY_LEN; i++) {
+        KEY[i] = keyiv[i];
+    }
+    for (i = KEY_LEN; i < KEY_LEN + IV_LEN; i++) {
+        IV[i - KEY_LEN] = keyiv[i];
+    }
+
+    if (!validate_key_iv()) {
+        return 0;
+    }
+
+    return save_key_iv_to_file();
+}
 
 void base64_generate_decoding_table() {
     int i;
@@ -141,37 +304,6 @@ int base64_decode(const char *encoded, unsigned char *out, int outlen) {
     return 1;
 }
 
-void get_encryption_key_and_iv(unsigned char *out_key, unsigned char *out_iv) {
-    FILE *file_key, *file_iv;
-
-    file_key = fopen(KEY_PATH, "r");
-    file_iv = fopen(IV_PATH, "r");
-
-    if (file_key == NULL) {
-        file_key = fopen(KEY_PATH, "w");
-        if (file_key == NULL)
-            return;
-        generate_password((char *)out_key, KEY_LEN);
-        fprintf(file_key, "%s", out_key);
-        fclose(file_key);
-    } else {
-        fgets((char *)out_key, KEY_LEN + 1, file_key);
-        fclose(file_key);
-    }
-
-    if (file_iv == NULL) {
-        file_iv = fopen(IV_PATH, "w");
-        if (file_iv == NULL)
-            return;
-        generate_password((char *)out_iv, IV_LEN);
-        fprintf(file_iv, "%s", out_iv);
-        fclose(file_key);
-    } else {
-        fgets((char *)out_iv, IV_LEN + 1, file_iv);
-        fclose(file_iv);
-    }
-}
-
 void cleanUp(EVP_CIPHER_CTX *ctx, EVP_CIPHER *cipher) {
     EVP_CIPHER_CTX_free(ctx);
     EVP_CIPHER_free(cipher);
@@ -191,13 +323,9 @@ int encrypt_str(unsigned char *message, unsigned char *outbuf) {
 
     int encoded_len;
     unsigned char encoded[1024];
-    const unsigned char key[KEY_LEN + 1];
-    const unsigned char iv[IV_LEN + 1];
     int len, final_len;
 
-    get_encryption_key_and_iv((unsigned char *)key, (unsigned char *)iv);
-
-    if (!EVP_EncryptInit_ex2(ctx, cipher, key, iv, NULL)) {
+    if (!EVP_EncryptInit_ex2(ctx, cipher, KEY, IV, NULL)) {
         cleanUp(ctx, cipher);
         return 0;
     }
@@ -236,18 +364,14 @@ int decrypt_str(const char *encoded_msg, unsigned char *outbuf) {
     }
 
     int len, final_len, encrypted_len;
-    const unsigned char key[KEY_LEN + 1];
-    const unsigned char iv[IV_LEN + 1];
     encrypted_len = base64_decoded_size(encoded_msg);
     unsigned char encrypted_msg[encrypted_len];
-
-    get_encryption_key_and_iv((unsigned char *)key, (unsigned char *)iv);
 
     if (!base64_decode(encoded_msg, encrypted_msg, encrypted_len)) {
         return 0;
     }
 
-    if (!EVP_DecryptInit_ex2(ctx, cipher, key, iv, NULL)) {
+    if (!EVP_DecryptInit_ex2(ctx, cipher, KEY, IV, NULL)) {
         cleanUp(ctx, cipher);
         return 0;
     }

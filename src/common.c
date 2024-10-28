@@ -1,4 +1,5 @@
 #include "common.h"
+#include "terminal.h"
 #include <stdio.h>
 
 struct account_record create_empty_account_record() {
@@ -149,6 +150,36 @@ int get_string_no_whitespaces(char *str, int size) {
 
     str[len] = '\0';
     return len;
+}
+
+int get_password_from_stdin(char *out, int size) {
+    char ch;
+    int i;
+
+    for (int i = 0; i < size; i++)
+        out[i] = '\0';
+
+    enable_raw_mode();
+
+    i = 0;
+    while (!is_end_of_string_char((ch = getchar())) && i < size - 1) {
+        if (ch == ' ') {
+            continue;
+        } else if (is_backspace_char(ch)) {
+            if (i > 0) {
+                --i;
+                printf("\b \b");
+            }
+            out[i] = '\0';
+        } else {
+            out[i++] = ch;
+            printf("*");
+        }
+    }
+    out[i] = '\0';
+
+    disable_raw_mode();
+    return i;
 }
 
 void print_by_chars(char *str) {

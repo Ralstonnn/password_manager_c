@@ -23,6 +23,7 @@ int get_records_size(struct account_record *records, int max_size);
 
 int get_string(char *str, int size);
 int get_string_no_whitespaces(char *str, int size);
+int get_password_from_stdin(char *out, int size);
 int is_char_int_string(char *str, char ch);
 
 void print_by_chars(char *str);
