@@ -10,6 +10,24 @@ int handle_search_records(void *data, int argc, char **argv, char **azColName);
 
 static int SQL_RECORDS_ITERATOR = 0;
 
+int init_db() {
+    FILE *file;
+    file = fopen(DB_FILE_PATH, "r");
+
+    if (file != NULL) {
+        fclose(file);
+        return 1;
+    }
+
+    sqlite3 *db;
+    int rc;
+
+    rc = sqlite3_open(DB_FILE_PATH, &db);
+    rc = sqlite3_exec(db, DB_MIGRATION, NULL, NULL, NULL);
+
+    return !rc;
+}
+
 int request_db(char *sql, void *data,
                int(callback)(void *data, int argc, char **argv,
                              char **azColName)) {
