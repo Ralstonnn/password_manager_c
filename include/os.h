@@ -17,9 +17,7 @@
 #elif defined(__linux__)
 #define PLATFORM_NAME                                                          \
     OS_LINUX // Debian, Ubuntu, Gentoo, Fedora, openSUSE, RedHat, Centos and
-// other
-#elif defined(__unix__) || !defined(__APPLE__) && defined(__MACH__)
-#elif TARGET_OS_MAC == 1
+#elif __APPLE__
 #define PLATFORM_NAME OS_MAC // Apple OSX
 #else
 #define PLATFORM_NAME OS_NULL
