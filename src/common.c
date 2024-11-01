@@ -90,6 +90,11 @@ int is_string_empty(char *str) {
     return 1;
 }
 
+void make_string_empty(char *str, int size) {
+    for (int i = 0; i < size; i++)
+        str[i] = '\0';
+}
+
 int are_equal_strings(char *str1, char *str2) {
     int i = 0;
     while (!is_end_of_string_char(str1[i]) && !is_end_of_string_char(str2[i])) {
@@ -143,9 +148,11 @@ int get_string_no_whitespaces(char *str, int size) {
     char ch;
 
     while ((ch = getchar()) != EOF && ch != '\n' && len < size - 1) {
-        if (ch == ' ')
+        if (ch == ' ') {
             continue;
-        str[len++] = ch;
+        } else {
+            str[len++] = ch;
+        }
     }
 
     str[len] = '\0';

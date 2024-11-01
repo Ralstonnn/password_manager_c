@@ -37,6 +37,7 @@ void copy_str(char *src, char *dest);
 int get_str_length(char *str);
 int is_end_of_string_char(char ch);
 int is_string_empty(char *str);
+void make_string_empty(char *str, int size);
 int string_to_int(char *str);
 int are_equal_strings(char *str1, char *str2);
 

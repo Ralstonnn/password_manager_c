@@ -26,6 +26,11 @@ int validate_password(char *str) {
     return validate_with_regexp(str, pattern);
 }
 
+int validate_username(char *str) {
+    char pattern[] = "^[A-Za-z0-9]+$";
+    return validate_with_regexp(str, pattern);
+}
+
 int is_number_string(char *str) {
     char pattern[] = "^[0-9]+$";
     return validate_with_regexp(str, pattern);

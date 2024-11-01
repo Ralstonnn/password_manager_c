@@ -63,17 +63,70 @@ void create_record() {
     disable_raw_mode();
     clear_screen();
     struct account_record record = create_empty_account_record();
+    int is_invalid = 0;
 
     printf("name (%d): ", USERNAME_BUFFER_SIZE - 1);
     get_string(record.name, USERNAME_BUFFER_SIZE);
     trim_whitespaces(record.name);
 
-    printf("username (%d): ", USERNAME_BUFFER_SIZE - 1);
-    get_string_no_whitespaces(record.username, USERNAME_BUFFER_SIZE);
+    while (1) {
+        clear_screen();
+        if (is_invalid) {
+            is_invalid = 0;
+            printf("The username was invalid\n");
+            printf("Username should be no longer than %d characters\n",
+                   USERNAME_BUFFER_SIZE - 1);
+            printf("And can only contain this characters: A-Za-z0-9\n\n");
+        }
 
+        printf("name (%d): %s\n", USERNAME_BUFFER_SIZE - 1, record.name);
+        printf("username (%d): ", USERNAME_BUFFER_SIZE - 1);
+        get_string_no_whitespaces(record.username, USERNAME_BUFFER_SIZE);
+
+        if (!validate_username(record.username) &&
+            !is_string_empty(record.username)) {
+            make_string_empty(record.username, USERNAME_BUFFER_SIZE);
+            is_invalid = 1;
+        } else {
+            is_invalid = 0;
+            break;
+        }
+    }
+
+    while (1) {
+        clear_screen();
+        if (is_invalid) {
+            is_invalid = 0;
+            printf("The password was invalid\n");
+            printf("Password should be no longer than %d characters\n",
+                   PASSWORD_BUFFER_SIZE - 1);
+            printf(
+                "And can only contain this characters: A-Za-z0-9!@#$%%&*^\n\n");
+        }
+
+        printf("name (%d): %s\n", USERNAME_BUFFER_SIZE - 1, record.name);
+        printf("username (%d): %s\n", USERNAME_BUFFER_SIZE - 1,
+               record.username);
+        printf("password (%d) <leave empty to generate random password>: ",
+               PASSWORD_BUFFER_SIZE - 1);
+        get_password_from_stdin(record.password, PASSWORD_BUFFER_SIZE);
+
+        if (!validate_password(record.password) &&
+            !is_string_empty(record.password)) {
+            make_string_empty(record.password, PASSWORD_BUFFER_SIZE);
+            is_invalid = 1;
+        } else {
+            is_invalid = 0;
+            break;
+        }
+    }
+
+    clear_screen();
+
+    printf("name (%d): %s\n", USERNAME_BUFFER_SIZE - 1, record.name);
+    printf("username (%d): %s\n", USERNAME_BUFFER_SIZE - 1, record.username);
     printf("password (%d) <leave empty to generate random password>: ",
            PASSWORD_BUFFER_SIZE - 1);
-    get_password_from_stdin(record.password, PASSWORD_BUFFER_SIZE);
     printf("\n\n");
 
     enable_raw_mode();
