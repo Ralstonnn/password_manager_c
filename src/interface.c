@@ -143,7 +143,7 @@ void create_record() {
 
     if (!is_string_empty(record.password) && !is_string_empty(record.name) &&
         !is_string_empty(record.username)) {
-        int is_saved = save_record_db(record);
+        int is_saved = save_record_db(&record);
         clear_screen();
         if (is_saved == 0)
             show_selected_record_screen(record);
@@ -240,6 +240,7 @@ void print_selected_record_screen(struct account_record record,
     printf("Press \"u\" to copy username\n");
     printf("Press \"p\" to copy password\n");
     printf("Press \"h\" to show/hide password\n");
+    printf("Press \"d\" to delete record\n");
     printf("Press \"q\" to quit to initial screen\n\n");
 
     printf("Record name: %s\n", record.name);
@@ -285,6 +286,30 @@ void show_selected_record_screen(struct account_record record) {
             print_selected_record_screen(record, is_password_hidden);
             printf("Password copied");
             break;
+        case 'd':
+            printf("Are you sure you want to delete this record?\n");
+            printf("Press <Enter> to continue or any other key to quit\n");
+            char ch_del = getchar();
+
+            if (ch_del != '\n') {
+                clear_screen();
+                print_selected_record_screen(record, is_password_hidden);
+                break;
+            }
+
+            if (delete_record_db(record.id)) {
+                printf("Something went wrong\nRecord was not deleted\nPress "
+                       "any key to continue\n");
+                break;
+            } else {
+                printf("\nRecord was deleted successfully!\nPress any key to "
+                       "continue\n");
+            }
+            getchar();
+            disable_raw_mode();
+            clear_screen();
+            print_initial_screen();
+            return;
         default:
             break;
         }

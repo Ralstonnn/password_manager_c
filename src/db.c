@@ -55,18 +55,37 @@ int request_db(char *sql, void *data,
     return result;
 }
 
-int save_record_db(struct account_record record) {
+int save_record_db(struct account_record *record) {
+    sqlite3 *db;
+
+    if (sqlite3_open(DB_FILE_PATH, &db)) {
+        return 0;
+    }
+
     char sql[1024];
     unsigned char password_encrypted[500];
 
-    if (!encrypt_str((unsigned char *)record.password, password_encrypted)) {
+    if (!encrypt_str((unsigned char *)record->password, password_encrypted)) {
         return 1;
     }
 
     sprintf(sql,
             "INSERT INTO records (name, username, password) VALUES (\"%s\", "
             "\"%s\", \"%s\")",
-            record.name, record.username, password_encrypted);
+            record->name, record->username, password_encrypted);
+
+    if (sqlite3_exec(db, sql, NULL, NULL, NULL) != SQLITE_OK) {
+        return 1;
+    }
+
+    record->id = sqlite3_last_insert_rowid(db);
+    sqlite3_close(db);
+    return 0;
+}
+
+int delete_record_db(int id) {
+    char sql[100];
+    sprintf(sql, "DELETE FROM records WHERE id=%i", id);
     return request_db(sql, NULL, NULL);
 }
 
