@@ -11,9 +11,12 @@
 #define IV_LEN 16
 #define KEY_PATH "../key_test"
 #define IV_PATH "../iv_test"
+#define BASE64_DECODING_TABLE_LENGTH 80
+#define BASE64_ENCODING_TABLE_LENGTH 64
+#define BASE64_ENCODING_TABLE_LOWEST_CHAR 43
 
 static unsigned char KEY[KEY_LEN + 1], IV[IV_LEN + 1];
-static int BASE64_DECODING_TABLE[80] = {
+static int BASE64_DECODING_TABLE[BASE64_DECODING_TABLE_LENGTH] = {
     62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1,
     -1, -1, -1, -1, -1, -1, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
@@ -184,12 +187,12 @@ int generate_key_and_iv() {
 void base64_generate_decoding_table() {
     int i;
 
-    for (i = 0; i < 80; i++) {
+    for (i = 0; i < BASE64_DECODING_TABLE_LENGTH; i++) {
         BASE64_DECODING_TABLE[i] = -1;
     }
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BASE64_ENCODING_TABLE_LENGTH; i++) {
         // 43 is the lowest char in encoding table (+) and should be at index 0
-        BASE64_DECODING_TABLE[BASE64_ENCODING_TABLE[i] - 43] = i;
+        BASE64_DECODING_TABLE[BASE64_ENCODING_TABLE[i] - BASE64_ENCODING_TABLE_LOWEST_CHAR] = i;
     }
 }
 
