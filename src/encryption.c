@@ -27,10 +27,8 @@ int generate_key_and_iv();
 int validate_key_iv();
 
 int encryption_init() {
-    FILE *file_key, *file_iv;
-
-    file_key = fopen(KEY_PATH, "r");
-    file_iv = fopen(IV_PATH, "r");
+    FILE *file_key = fopen(KEY_PATH, "r");
+    FILE *file_iv = fopen(IV_PATH, "r");
 
     if (file_key == NULL || file_iv == NULL) {
         if (file_key != NULL)
@@ -72,10 +70,8 @@ int validate_key_iv() {
 }
 
 int save_key_iv_to_file() {
-    FILE *file_key, *file_iv;
-
-    file_key = fopen(KEY_PATH, "w");
-    file_iv = fopen(IV_PATH, "w");
+    FILE *file_key = fopen(KEY_PATH, "w");
+    FILE *file_iv = fopen(IV_PATH, "w");
 
     if (file_key == NULL || file_iv == NULL) {
         if (file_key != NULL)
@@ -366,8 +362,8 @@ int decrypt_str(const char *encoded_msg, unsigned char *outbuf) {
         return 0;
     }
 
-    int len, final_len, encrypted_len;
-    encrypted_len = base64_decoded_size(encoded_msg);
+    int len, final_len;
+    const int encrypted_len = base64_decoded_size(encoded_msg);
     unsigned char encrypted_msg[encrypted_len];
 
     if (!base64_decode(encoded_msg, encrypted_msg, encrypted_len)) {
