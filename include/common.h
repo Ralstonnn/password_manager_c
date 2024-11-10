@@ -6,8 +6,6 @@
 
 #define MAX_LINE_SIZE 526
 
-#define FILE_PATH "../test.txt"
-
 struct account_record {
     int id;
     char name[USERNAME_BUFFER_SIZE];
