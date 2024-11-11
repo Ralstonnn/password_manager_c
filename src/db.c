@@ -83,6 +83,22 @@ int save_record_db(struct account_record *record) {
     return 0;
 }
 
+int update_record_db(struct account_record record) {
+    char sql[1024];
+    unsigned char password_encrypted[500];
+
+    if (!encrypt_str((unsigned char *)record.password, password_encrypted)) {
+        return 1;
+    }
+
+    sprintf(sql,
+            "UPDATE records SET name=\"%s\", username=\"%s\", password=\"%s\" "
+            "WHERE id = %i",
+            record.name, record.username, password_encrypted, record.id);
+
+    return request_db(sql, NULL, NULL);
+}
+
 int delete_record_db(int id) {
     char sql[100];
     sprintf(sql, "DELETE FROM records WHERE id=%i", id);

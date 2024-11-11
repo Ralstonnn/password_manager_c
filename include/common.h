@@ -29,6 +29,7 @@ void print_by_chars(char *str);
 void trim(char *str, char ch);
 void trim_whitespaces(char *str);
 int is_backspace_char(char ch);
+int is_escape_char(char ch);
 int is_english_letter(char ch);
 
 void copy_str(char *src, char *dest);

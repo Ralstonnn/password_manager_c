@@ -234,15 +234,19 @@ void show_search_records() {
     }
 }
 
-void print_selected_record_screen(struct account_record record,
-                                  int is_password_hidden) {
+void print_selected_record_hotkeys() {
     printf("Record selected \n\n");
     printf("Press \"u\" to copy username\n");
     printf("Press \"p\" to copy password\n");
     printf("Press \"h\" to show/hide password\n");
+    printf("Press \"c\" to change record\n");
     printf("Press \"d\" to delete record\n");
     printf("Press \"q\" to quit to initial screen\n\n");
+}
 
+void print_selected_record_screen(struct account_record record,
+                                  int is_password_hidden) {
+    print_selected_record_hotkeys();
     printf("Record name: %s\n", record.name);
     printf("Username   : %s\n", record.username);
 
@@ -257,11 +261,115 @@ void print_selected_record_screen(struct account_record record,
     printf("\n");
 }
 
+void print_change_record_screen(struct account_record record,
+                                int is_changing_name, int is_changing_username,
+                                int is_changing_password) {
+    print_selected_record_hotkeys();
+
+    if (is_changing_name)
+        printf("Record name (press <Enter> to continue): %s\n", record.name);
+    else
+        printf("Record name: %s\n", record.name);
+    if (is_changing_username)
+        printf("Username    (press <Enter> to continue): %s\n",
+               record.username);
+    else
+        printf("Username   : %s\n", record.username);
+
+    if (is_changing_password)
+        printf("Password    (press <Enter> to continue): %s\n",
+               record.password);
+    else
+        printf("Password   : %s\n", record.password);
+
+    printf("\n");
+}
+
+int change_record_screen(struct account_record *record) {
+    enable_raw_mode();
+
+    char ch, new_value[PASSWORD_BUFFER_SIZE + 5];
+    int is_changing_name, is_changing_username, is_changing_password, len;
+
+    const int prefix_len = 41;
+    is_changing_name = 1;
+    is_changing_username = is_changing_password = 0;
+
+    while (1) {
+        clear_screen();
+        print_change_record_screen(*record, is_changing_name,
+                                   is_changing_username, is_changing_password);
+
+        if (is_changing_name) {
+            len = get_str_length(record->name);
+            set_cursor_position(10, prefix_len + len + 1);
+        } else if (is_changing_username) {
+            len = get_str_length(record->username);
+            set_cursor_position(11, prefix_len + len + 1);
+        } else {
+            len = get_str_length(record->password);
+            set_cursor_position(12, prefix_len + len + 1);
+        }
+
+        ch = getchar();
+
+        if (is_escape_char(ch)) {
+            break;
+        } else if (ch == '\n') {
+            if (is_changing_name) {
+                is_changing_name = 0;
+                is_changing_username = 1;
+            } else if (is_changing_username) {
+                is_changing_username = 0;
+                is_changing_password = 1;
+            } else {
+                break;
+            }
+        } else if (is_backspace_char(ch)) {
+            if (is_changing_name && len > 0) {
+                record->name[len - 1] = '\0';
+            } else if (is_changing_username && len > 0) {
+                record->username[len - 1] = '\0';
+            } else if (len > 0) {
+                record->password[len - 1] = '\0';
+            }
+        } else {
+            if (is_changing_name && len < USERNAME_BUFFER_SIZE) {
+                record->name[len] = ch;
+                record->name[len + 1] = '\0';
+            } else if (is_changing_username && len < USERNAME_BUFFER_SIZE) {
+                sprintf(new_value, "%s%c", record->username, ch);
+                if (validate_username(new_value)) {
+                    record->username[len] = ch;
+                    record->username[len + 1] = '\0';
+                }
+            } else if (len < PASSWORD_BUFFER_SIZE) {
+                sprintf(new_value, "%s%c", record->password, ch);
+                if (validate_password(new_value)) {
+                    record->password[len] = ch;
+                    record->password[len + 1] = '\0';
+                }
+            }
+        }
+    }
+
+    if (update_record_db(*record))
+        return 0;
+
+    struct account_record new_record;
+    if (get_record_by_id_db(&new_record, record->id))
+        return 0;
+
+    *record = new_record;
+    return 1;
+}
+
 void show_selected_record_screen(struct account_record record) {
     enable_raw_mode();
     clear_screen();
 
     int is_password_hidden = 1;
+    int change_record_result;
 
     print_selected_record_screen(record, is_password_hidden);
 
@@ -285,6 +393,15 @@ void show_selected_record_screen(struct account_record record) {
             clear_screen();
             print_selected_record_screen(record, is_password_hidden);
             printf("Password copied");
+            break;
+        case 'c':
+            change_record_result = change_record_screen(&record);
+            clear_screen();
+            print_selected_record_screen(record, is_password_hidden);
+            if (!change_record_result)
+                printf("Something went wrong");
+            else
+                printf("Record was updated successfully");
             break;
         case 'd':
             printf("Are you sure you want to delete this record?\n");
