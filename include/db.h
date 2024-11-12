@@ -12,6 +12,7 @@ int request_db(char *sql, void *data,
 int search_records_db(struct account_record *records, char *search_str,
                       int max_size);
 int save_record_db(struct account_record *record);
+int update_record_db(struct account_record record);
 int delete_record_db(int id);
 int get_record_by_id_db(struct account_record *record, int id);
 

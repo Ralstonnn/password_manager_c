@@ -58,6 +58,7 @@ int is_char_int_string(char *str, char ch) {
 }
 
 int is_backspace_char(char ch) { return ch == '\b' || ch == 127; }
+int is_escape_char(char ch) { return ch == 27; }
 
 int is_english_letter(char ch) {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
