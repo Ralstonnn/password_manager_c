@@ -185,20 +185,18 @@ void show_search_records() {
     while (!is_end_of_string_char((ch = getchar())) && i < 55) {
         hide_cursor();
 
-        if (ch == '\x1b') {
+        if (ch == '\033') {
+            getchar();
             ch = getchar();
-            if (ch == '[') {
-                ch = getchar();
-                switch (ch) {
-                case 'A': // Up arrow
-                    if (selected_record_idx > 0)
-                        selected_record_idx--;
-                    break;
-                case 'B': // Down arrow
-                    if (selected_record_idx < records_size - 1)
-                        selected_record_idx++;
-                    break;
-                }
+            switch (ch) {
+            case 'A': // Up arrow
+                if (selected_record_idx > 0)
+                    selected_record_idx--;
+                break;
+            case 'B': // Down arrow
+                if (selected_record_idx < records_size - 1)
+                    selected_record_idx++;
+                break;
             }
         } else if (is_backspace_char(ch)) {
             if (i > 0)
