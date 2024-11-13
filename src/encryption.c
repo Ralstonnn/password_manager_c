@@ -1,4 +1,5 @@
 #include "common.h"
+#include "paths.h"
 #include "terminal.h"
 #include "validations.h"
 #include <openssl/evp.h>
@@ -9,8 +10,6 @@
 #define CIPHER_ALGORITHM "AES-128-CBC"
 #define KEY_LEN 16
 #define IV_LEN 16
-#define KEY_PATH "../key_test"
-#define IV_PATH "../iv_test"
 #define BASE64_DECODING_TABLE_LENGTH 80
 #define BASE64_ENCODING_TABLE_LENGTH 64
 #define BASE64_ENCODING_TABLE_LOWEST_CHAR 43

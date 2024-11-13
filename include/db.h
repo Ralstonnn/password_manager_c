@@ -3,8 +3,6 @@
 
 #include "common.h"
 
-#define DB_FILE_PATH "../test.db"
-
 int init_db();
 int request_db(char *sql, void *data,
                int(callback)(void *data, int argc, char **argv,

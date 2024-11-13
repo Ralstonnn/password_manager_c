@@ -1,6 +1,7 @@
 #include "db.h"
 #include "common.h"
 #include "encryption.h"
+#include "paths.h"
 #include <sqlite3.h>
 #include <stdio.h>
 
