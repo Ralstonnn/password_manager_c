@@ -265,17 +265,18 @@ void print_change_record_screen(struct account_record record,
     print_selected_record_hotkeys();
 
     if (is_changing_name)
-        printf("Record name (press <Enter> to continue): %s\n", record.name);
+        printf("Record name (Press <Enter> to continue): %s\n", record.name);
     else
         printf("Record name: %s\n", record.name);
     if (is_changing_username)
-        printf("Username    (press <Enter> to continue): %s\n",
+        printf("Username    (Press <Enter> to continue): %s\n",
                record.username);
     else
         printf("Username   : %s\n", record.username);
 
     if (is_changing_password)
-        printf("Password    (press <Enter> to continue): %s\n",
+        printf("Password    (Press <Enter> to continue. Leave empty to "
+               "generate password): %s\n",
                record.password);
     else
         printf("Password   : %s\n", record.password);
@@ -306,7 +307,7 @@ int change_record_screen(struct account_record *record) {
             set_cursor_position(11, prefix_len + len + 1);
         } else {
             len = get_str_length(record->password);
-            set_cursor_position(12, prefix_len + len + 1);
+            set_cursor_position(12, prefix_len + 34 + len + 1);
         }
 
         ch = getchar();
@@ -320,6 +321,13 @@ int change_record_screen(struct account_record *record) {
             } else if (is_changing_username) {
                 is_changing_username = 0;
                 is_changing_password = 1;
+            } else if (is_changing_password &&
+                       !get_str_length(record->password)) {
+                clear_screen();
+                disable_raw_mode();
+                generate_password(record->password,
+                                  get_random_password_length(NULL));
+                enable_raw_mode();
             } else {
                 break;
             }
