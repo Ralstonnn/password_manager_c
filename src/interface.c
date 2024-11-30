@@ -314,7 +314,8 @@ int change_record_screen(struct account_record *record) {
 
         if (is_escape_char(ch)) {
             break;
-        } else if (ch == '\n') {
+        }
+        if (ch == '\n') {
             if (is_changing_name) {
                 is_changing_name = 0;
                 is_changing_username = 1;
