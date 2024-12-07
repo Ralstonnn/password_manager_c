@@ -27,7 +27,8 @@ add_executable(
         src/copy_to_clipboard.c
         src/password_generator.c
         src/validations.c
-        src/json.c
+        src/json_import.c
+        src/json_export.c
 )
 
 target_link_libraries(PasswordManager SQLite::SQLite3)

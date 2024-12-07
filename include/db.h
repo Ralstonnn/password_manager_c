@@ -13,6 +13,9 @@ int save_record_db(struct account_record *record);
 int update_record_db(struct account_record record);
 int delete_record_db(int id);
 int get_record_by_id_db(struct account_record *record, int id);
+int get_record_with_offset_db(struct account_record *record, const int limit,
+                              const int offset);
+int get_records_count_db();
 
 #define DB_MIGRATION                                                           \
     "CREATE TABLE records ("                                                   \

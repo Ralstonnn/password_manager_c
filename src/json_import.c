@@ -9,7 +9,7 @@ int parse(char *json_str);
 /*
 **  IMPORT
 */
-int import_json() {
+int json_import() {
     char json_str[JSON_STRING_MAX];
     if (!read_json(json_str)) {
         return 0;
