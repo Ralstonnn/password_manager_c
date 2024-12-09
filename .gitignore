@@ -8,6 +8,7 @@ Makefile
 
 build*/
 compile_commands.json
+cmake-build-debug/
 
 .DS_Store
 
@@ -18,3 +19,5 @@ test.txt
 test.db
 iv_test
 key_test
+
+*.json

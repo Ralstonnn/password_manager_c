@@ -1,13 +1,10 @@
-#include "common.h"
+#include "db.h"
 #include "encryption.h"
 #include "interface.h"
+#include "paths.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "db.h"
-#include "paths.h"
-
-struct account_record split(char *str);
 
 int main() {
     // Called for rand() to work
@@ -25,6 +22,7 @@ int main() {
         printf("Failed to initialize encryption\n");
         return 1;
     }
+
     print_interface();
 
     return 0;

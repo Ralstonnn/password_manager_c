@@ -8,6 +8,8 @@
 int handle_set_record_from_db(void *data, int argc, char **argv,
                               char **azColName);
 int handle_search_records(void *data, int argc, char **argv, char **azColName);
+int handle_get_records_count(void *data, int argc, char **argv,
+                             char **azColName);
 
 static int SQL_RECORDS_ITERATOR = 0;
 
@@ -95,7 +97,8 @@ int update_record_db(struct account_record record) {
     sprintf(sql,
             "UPDATE records SET name=\"%s\", username=\"%s\", password=\"%s\" "
             "WHERE id = %i",
-            record.name, record.username, password_encrypted, record.id);
+            record.name, record.username, (char *)password_encrypted,
+            record.id);
 
     return request_db(sql, NULL, NULL);
 }
@@ -107,7 +110,7 @@ int delete_record_db(int id) {
 }
 
 int search_records_db(struct account_record *records, char *search_str,
-                      int max_size) {
+                      const int max_size) {
     char sql[256];
     sprintf(sql,
             "SELECT id, name, username FROM records WHERE name LIKE "
@@ -116,12 +119,30 @@ int search_records_db(struct account_record *records, char *search_str,
     return request_db(sql, records, handle_search_records);
 }
 
-int get_record_by_id_db(struct account_record *record, int id) {
+int get_record_by_id_db(struct account_record *record, const int id) {
     char sql[256];
     sprintf(sql,
             "SELECT id, name, username, password FROM records WHERE id = %i",
             id);
     return request_db(sql, record, handle_set_record_from_db);
+}
+
+int get_record_with_offset_db(struct account_record *record, const int limit,
+                              const int offset) {
+    char sql[100];
+    sprintf(
+        sql,
+        "SELECT id, name, username, password FROM records LIMIT %i OFFSET %i",
+        limit, offset);
+    return request_db(sql, record, handle_set_record_from_db);
+}
+
+int get_records_count_db() {
+    const char sql[30] = "SELECT count(id) FROM records";
+    int count = 0;
+    if (request_db(sql, &count, handle_get_records_count))
+        return 0;
+    return count;
 }
 
 int handle_search_records(void *data, int argc, char **argv, char **azColName) {
@@ -158,5 +179,18 @@ int handle_set_record_from_db(void *data, int argc, char **argv,
         }
     }
 
+    return 0;
+}
+
+int handle_get_records_count(void *data, int argc, char **argv,
+                             char **azColName) {
+    for (int i = 0; i < argc; i++) {
+        char *value = argv[i] ? argv[i] : "NULL";
+        char *colName = azColName[i];
+
+        if (are_equal_strings(colName, "count(id)")) {
+            *(int *)data = string_to_int(value);
+        }
+    }
     return 0;
 }
