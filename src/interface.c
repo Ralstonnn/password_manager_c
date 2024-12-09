@@ -2,6 +2,7 @@
 #include "copy_to_clipboard.h"
 #include "db.h"
 #include "json_export.h"
+#include "json_import.h"
 #include "password_generator.h"
 #include "terminal.h"
 #include "validations.h"
@@ -23,6 +24,7 @@ void print_selected_record_screen(struct account_record record,
                                   int is_password_hidden);
 void show_generate_random_password();
 int get_random_password_length(char *message);
+void show_import_json_screen();
 void show_export_to_json_screen();
 
 void print_interface() {
@@ -43,6 +45,9 @@ void print_interface() {
             break;
         case 'r':
             show_generate_random_password();
+            break;
+        case 'i':
+            show_import_json_screen();
             break;
         case 'e':
             show_export_to_json_screen();
@@ -506,6 +511,34 @@ void show_generate_random_password() {
     print_initial_screen();
 }
 
+void show_import_json_screen() {
+    disable_raw_mode();
+    clear_screen();
+
+    const int PATH_SIZE = 1000;
+    char path[PATH_SIZE];
+    printf("Please enter absolute path to file: ");
+    get_string_no_whitespaces(path, PATH_SIZE);
+    clear_screen();
+
+    if (is_string_empty(path))
+        return;
+
+    if (json_import(path)) {
+        printf("JSON imported successfully\n");
+    } else {
+        printf("JSON import failed\n");
+    }
+    printf("\nPress ENTER to continue\n");
+
+    int ch;
+    while ((ch = getchar()) != '\n')
+        ;
+
+    clear_screen();
+    print_initial_screen();
+}
+
 void show_export_to_json_screen() {
     disable_raw_mode();
     clear_screen();
@@ -546,7 +579,8 @@ void print_initial_screen() {
     printf("> (c) create\n");
     printf("> (s) search\n");
     printf("> (r) generate random password\n");
-    printf("> (e) export records to JSON\n");
+    printf("> (i) import records from JSON file\n");
+    printf("> (e) export records to JSON file\n");
     printf("> (q) quit\n");
     printf("\n");
 }

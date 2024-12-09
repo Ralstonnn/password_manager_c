@@ -1,7 +1,6 @@
 #include "db.h"
 #include "encryption.h"
 #include "interface.h"
-#include "json_import.h"
 #include "paths.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,8 +22,6 @@ int main() {
         printf("Failed to initialize encryption\n");
         return 1;
     }
-
-    // json_import();
 
     print_interface();
 

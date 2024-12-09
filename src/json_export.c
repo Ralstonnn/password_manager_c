@@ -37,16 +37,20 @@ int write_items(const char *path) {
             sprintf(template,
                     "\t\t{\n"
                     "\t\t\t\"name\": \"%s\",\n"
-                    "\t\t\t\"username\": \"%s\",\n"
-                    "\t\t\t\"password\": \"%s\"\n"
+                    "\t\t\t\"login\": {\n"
+                    "\t\t\t\t\"username\": \"%s\",\n"
+                    "\t\t\t\t\"password\": \"%s\"\n"
+                    "\t\t\t}\n"
                     "\t\t}\n",
                     record.name, record.username, record.password);
         } else {
             sprintf(template,
                     "\t\t{\n"
                     "\t\t\t\"name\": \"%s\",\n"
-                    "\t\t\t\"username\": \"%s\",\n"
-                    "\t\t\t\"password\": \"%s\"\n"
+                    "\t\t\t\"login\": {\n"
+                    "\t\t\t\t\"username\": \"%s\",\n"
+                    "\t\t\t\t\"password\": \"%s\"\n"
+                    "\t\t\t}\n"
                     "\t\t},\n",
                     record.name, record.username, record.password);
         }
