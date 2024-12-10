@@ -6,6 +6,7 @@
 #include "password_generator.h"
 #include "terminal.h"
 #include "validations.h"
+#include <math.h>
 #include <stdio.h>
 
 #define HEADER_LENGTH 40
@@ -178,21 +179,35 @@ void print_records(struct account_record *records, int records_size,
     }
 }
 
+void update_search_records_records(char *search_str,
+                                   const int records_page_current,
+                                   const int RECORDS_SIZE_MAX,
+                                   struct account_record *records,
+                                   int *records_size) {
+    fill_arrays_with_empty_records(records, RECORDS_SIZE_MAX);
+    search_records_db(records, search_str, RECORDS_SIZE_MAX,
+                      records_page_current);
+    *records_size = get_records_size(records, RECORDS_SIZE_MAX);
+}
+
 void show_search_records() {
     clear_screen();
     enable_raw_mode();
     printf("Search: ");
 
-    char search_str[56];
+    const int SEARCH_STR_MAX_LEN = 56;
+    char search_str[SEARCH_STR_MAX_LEN], search_str_prev[SEARCH_STR_MAX_LEN];
     char ch;
-    int i, selected_record_idx, records_size_max, records_size;
+    int i, selected_record_idx, records_size, records_pages_total,
+        records_page_current;
+    const int RECORDS_SIZE_MAX = 5;
 
-    i = selected_record_idx = 0;
-    records_size_max = 5;
+    i = selected_record_idx = records_page_current = records_pages_total =
+        records_size = 0;
 
-    struct account_record records[records_size_max];
+    struct account_record records[RECORDS_SIZE_MAX];
 
-    while (!is_end_of_string_char((ch = getchar())) && i < 55) {
+    while (!is_end_of_string_char((ch = (char)getchar())) && i < 55) {
         hide_cursor();
 
         if (ch == '\033') {
@@ -203,9 +218,25 @@ void show_search_records() {
                 if (selected_record_idx > 0)
                     selected_record_idx--;
                 break;
+            case 'C': // Right arrow
+                if (records_page_current >= records_pages_total - 1)
+                    break;
+                records_page_current++;
+                update_search_records_records(search_str, records_page_current,
+                                              RECORDS_SIZE_MAX, records,
+                                              &records_size);
+                break;
             case 'B': // Down arrow
                 if (selected_record_idx < records_size - 1)
                     selected_record_idx++;
+                break;
+            case 'D': // Left arrow
+                if (records_page_current <= 0)
+                    break;
+                records_page_current--;
+                update_search_records_records(search_str, records_page_current,
+                                              RECORDS_SIZE_MAX, records,
+                                              &records_size);
                 break;
             }
         } else if (is_backspace_char(ch)) {
@@ -217,13 +248,24 @@ void show_search_records() {
             search_str[i] = '\0';
         }
 
-        clear_screen();
+        if (!are_equal_strings(search_str, search_str_prev)) {
+            copy_str(search_str, search_str_prev);
+            records_page_current = 0;
+            records_pages_total =
+                ceil((double)get_search_by_name_records_count_db(search_str) /
+                     (double)RECORDS_SIZE_MAX);
+            records_pages_total =
+                records_pages_total > 0 ? records_pages_total : 1;
+            update_search_records_records(search_str, records_page_current,
+                                          RECORDS_SIZE_MAX, records,
+                                          &records_size);
+        }
 
+        clear_screen();
         printf("Search: %s\n\n", search_str);
-        fill_arrays_with_empty_records(records, records_size_max);
-        search_records_db(records, search_str, records_size_max);
-        records_size = get_records_size(records, records_size_max);
         print_records(records, records_size, selected_record_idx);
+        printf("\nPage: %i:%i\n", records_page_current + 1,
+               records_pages_total);
 
         set_cursor_position(0, 8 + i + 1);
         show_cursor();

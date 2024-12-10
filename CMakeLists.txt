@@ -33,4 +33,4 @@ add_executable(
 
 target_link_libraries(PasswordManager SQLite::SQLite3)
 target_link_libraries(PasswordManager OpenSSL::SSL OpenSSL::Crypto)
-
+target_link_libraries(PasswordManager m) # Math library

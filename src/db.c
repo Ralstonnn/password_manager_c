@@ -110,12 +110,12 @@ int delete_record_db(int id) {
 }
 
 int search_records_db(struct account_record *records, char *search_str,
-                      const int max_size) {
-    char sql[256];
+                      const int max_size, const int page) {
+    char sql[512];
     sprintf(sql,
             "SELECT id, name, username FROM records WHERE name LIKE "
-            "\"%%%s%%\" LIMIT %i",
-            search_str, max_size);
+            "\"%%%s%%\" LIMIT %i,%i",
+            search_str, page * max_size, max_size);
     return request_db(sql, records, handle_search_records);
 }
 
@@ -139,6 +139,16 @@ int get_record_with_offset_db(struct account_record *record, const int limit,
 
 int get_records_count_db() {
     const char sql[30] = "SELECT count(id) FROM records";
+    int count = 0;
+    if (request_db(sql, &count, handle_get_records_count))
+        return 0;
+    return count;
+}
+
+int get_search_by_name_records_count_db(char *name) {
+    char sql[256];
+    sprintf(sql, "SELECT count(id) FROM records WHERE name LIKE \"%%%s%%\"",
+            name);
     int count = 0;
     if (request_db(sql, &count, handle_get_records_count))
         return 0;
