@@ -87,7 +87,8 @@ void create_record() {
             printf("The username was invalid\n");
             printf("Username should be no longer than %d characters\n",
                    USERNAME_BUFFER_SIZE - 1);
-            printf("And can only contain this characters: A-Za-z0-9\n\n");
+            printf("And can only contain this characters: "
+                   "A-Za-z0-9!@#$%%&*^.\n\n");
         }
 
         printf("name (%d): %s\n", USERNAME_BUFFER_SIZE - 1, record.name);
